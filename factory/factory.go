@@ -1,8 +1,6 @@
 package factory
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/velosypedno/resource-allocation/base"
@@ -46,7 +44,7 @@ func (f *Factory) Plan(startTime time.Time) (base.Solution, SchedulingInfo, erro
 		StrategyDescription: f.Planner.Description(),
 	}
 
-	if err := f.Validate(); err != nil {
+	if err := f.validate(); err != nil {
 		schedulingMetaInfo.SchedulingTime = time.Since(startPlanning)
 		return base.Solution{}, SchedulingInfo{}, err
 	}
@@ -58,38 +56,13 @@ func (f *Factory) Plan(startTime time.Time) (base.Solution, SchedulingInfo, erro
 	schedulingInfo := SchedulingInfo{
 		SchedulingMetaInfo: schedulingMetaInfo,
 		MakeSpan:           workflowPeriod.Duration(),
-		UtilizationLevel:   GetUtilizationLevel(machineSlotsMap, workflowPeriod.Duration()),
+		UtilizationLevel:   machineSlotsMap.GetUtilizationLevel(workflowPeriod.Duration()),
 	}
 
 	return solution, schedulingInfo, nil
 }
 
-func GetUtilizationLevel(machineSlotsMap base.MachineTimeSlots, duration time.Duration) float64 {
-	var sumDuration time.Duration
-
-	for _, slots := range machineSlotsMap {
-		for _, slot := range slots {
-			sumDuration += slot.Duration()
-		}
-	}
-
-	return (float64(sumDuration) / float64(len(machineSlotsMap))) / float64(duration)
-
-}
-
-type MissingMachinesError struct {
-	MissingTypes []base.MachineType
-}
-
-func (e *MissingMachinesError) Error() string {
-	var types []string
-	for _, t := range e.MissingTypes {
-		types = append(types, t.String())
-	}
-	return fmt.Sprintf("missing required machine types: %s", strings.Join(types, ", "))
-}
-
-func (f *Factory) Validate() error {
+func (f *Factory) validate() error {
 	neededMachineTypesMap := make(map[base.MachineType]struct{})
 
 	for _, job := range f.Jobs {

@@ -1,6 +1,9 @@
 package base
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type (
 	MachineType uint
@@ -49,4 +52,16 @@ func NewMachine(id MachineID, machineType MachineType) Machine {
 		ID:   id,
 		Type: machineType,
 	}
+}
+
+func (m MachineTimeSlots) GetUtilizationLevel(duration time.Duration) float64 {
+	var sumDuration time.Duration
+
+	for _, slots := range m {
+		for _, slot := range slots {
+			sumDuration += slot.Duration()
+		}
+	}
+
+	return (float64(sumDuration) / float64(len(m))) / float64(duration)
 }

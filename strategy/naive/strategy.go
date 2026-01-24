@@ -28,20 +28,20 @@ func (s *Strategy) Plan(
 	machines []*base.Machine,
 	startTime time.Time,
 ) (base.Solution, base.MachineTimeSlots) {
-	occupiedMap := InitTimeSlotsMap(machines)
-	machineTypeIndex := InitMachineTypeIndex(machines)
+	occupiedMap := initTimeSlotsMap(machines)
+	machineTypeIndex := initMachineTypeIndex(machines)
 
 	solution := base.Solution{}
 
 	for _, job := range jobs {
-		jobSolution := PlanJob(job, machines, startTime, occupiedMap, machineTypeIndex)
+		jobSolution := planJob(job, machines, startTime, occupiedMap, machineTypeIndex)
 		solution.Jobs = append(solution.Jobs, jobSolution)
 	}
 
 	return solution, occupiedMap
 }
 
-func InitTimeSlotsMap(machines []*base.Machine) base.MachineTimeSlots {
+func initTimeSlotsMap(machines []*base.Machine) base.MachineTimeSlots {
 	timeSlotsMap := make(map[base.MachineID][]base.Period)
 	for _, machine := range machines {
 		timeSlotsMap[machine.ID] = []base.Period{}
@@ -49,7 +49,7 @@ func InitTimeSlotsMap(machines []*base.Machine) base.MachineTimeSlots {
 	return timeSlotsMap
 }
 
-func InitMachineTypeIndex(machines []*base.Machine) base.MachineTypeIndex {
+func initMachineTypeIndex(machines []*base.Machine) base.MachineTypeIndex {
 	machineTypeIndex := make(map[base.MachineType][]base.MachineID)
 	for _, machine := range machines {
 		machineTypeIndex[machine.Type] = append(machineTypeIndex[machine.Type], machine.ID)
@@ -57,7 +57,7 @@ func InitMachineTypeIndex(machines []*base.Machine) base.MachineTypeIndex {
 	return machineTypeIndex
 }
 
-func PlanJob(
+func planJob(
 	job *base.Job,
 	machines []*base.Machine,
 	startTime time.Time,
@@ -69,14 +69,14 @@ func PlanJob(
 		OperationSolutions: []*base.OperationSolution{},
 	}
 	for _, operation := range job.Operations {
-		operationSolution := PlanOperation(operation, machines, startTime, occupiedMap, machineTypeIndex)
+		operationSolution := planOperation(operation, machines, startTime, occupiedMap, machineTypeIndex)
 		jobSolution.OperationSolutions = append(jobSolution.OperationSolutions, operationSolution)
 	}
 
 	return jobSolution
 }
 
-func PlanOperation(
+func planOperation(
 	operation *base.Operation,
 	machines []*base.Machine,
 	startTime time.Time,
@@ -91,11 +91,11 @@ func PlanOperation(
 	for _, child := range operation.ChildOperations {
 		operationSolution.ChildSolutions = append(
 			operationSolution.ChildSolutions,
-			PlanOperation(child, machines, startTime, occupiedMap, machineTypeIndex))
+			planOperation(child, machines, startTime, occupiedMap, machineTypeIndex))
 	}
 	lastChildEndTime, err := operationSolution.GetLastChildCompletionTime()
 	if errors.Is(err, base.ErrNoChildrenFound) {
-		targetMachineID, targetPeriod := FindBestSlot(
+		targetMachineID, targetPeriod := findBestSlot(
 			startTime,
 			operation.Duration,
 			operation.MachineType,
@@ -111,7 +111,7 @@ func PlanOperation(
 		panic(err)
 	}
 
-	targetMachineID, targetPeriod := FindBestSlot(
+	targetMachineID, targetPeriod := findBestSlot(
 		lastChildEndTime,
 		operation.Duration,
 		operation.MachineType,
@@ -126,7 +126,7 @@ func PlanOperation(
 
 }
 
-func FindBestSlot(
+func findBestSlot(
 	startTime time.Time,
 	duration time.Duration,
 	machineType base.MachineType,

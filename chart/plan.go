@@ -32,7 +32,7 @@ const renderTooltipJS = `function(p){
 			timeStart + ' - ' + timeEnd;
 }`
 
-func SortMachines(machines []*base.Machine) {
+func sortMachines(machines []*base.Machine) {
 	sort.Slice(machines, func(i, j int) bool {
 		if machines[i].Type != machines[j].Type {
 			return machines[i].Type < machines[j].Type
@@ -57,7 +57,7 @@ func generateYAxisCategories(machines []*base.Machine) []string {
 	return categories
 }
 
-func CreateBaseCustomChart(machines []*base.Machine, period base.Period, description string) *charts.Custom {
+func createBaseCustomChart(machines []*base.Machine, period base.Period, description string) *charts.Custom {
 	chart := charts.NewCustom()
 
 	lineCount := strings.Count(description, "\n") + 1
@@ -138,7 +138,7 @@ func CreateBaseCustomChart(machines []*base.Machine, period base.Period, descrip
 	return chart
 }
 
-func AddSolutionSeries(chart *charts.Custom, solution base.Solution, machines []*base.Machine) {
+func addSolutionSeries(chart *charts.Custom, solution base.Solution, machines []*base.Machine) {
 	mMap := generateMachineIndexMap(machines)
 
 	for _, job := range solution.Jobs {
@@ -166,22 +166,6 @@ func AddSolutionSeries(chart *charts.Custom, solution base.Solution, machines []
 	}
 }
 
-func GenerateFromSolution(
-	solution base.Solution,
-	machines []*base.Machine,
-	schedulingInfo factory.SchedulingInfo,
-) *charts.Custom {
-	SortMachines(machines)
-
-	period := solution.GetWorkFlowPeriod()
-	description := formatStrategyDescription(schedulingInfo)
-	chart := CreateBaseCustomChart(machines, period, description)
-
-	AddSolutionSeries(chart, solution, machines)
-
-	return chart
-}
-
 func formatStrategyDescription(meta factory.SchedulingInfo) string {
 	execTime := meta.SchedulingTime.Round(time.Millisecond).String()
 	makespan := meta.MakeSpan.String()
@@ -200,4 +184,18 @@ func formatStrategyDescription(meta factory.SchedulingInfo) string {
 		line2,
 		meta.StrategyDescription,
 	)
+}
+
+func GenerateFromSolution(
+	solution base.Solution,
+	machines []*base.Machine,
+	schedulingInfo factory.SchedulingInfo,
+) *charts.Custom {
+	sortMachines(machines)
+	period := solution.GetWorkFlowPeriod()
+	description := formatStrategyDescription(schedulingInfo)
+
+	chart := createBaseCustomChart(machines, period, description)
+	addSolutionSeries(chart, solution, machines)
+	return chart
 }
