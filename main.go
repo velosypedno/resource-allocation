@@ -12,34 +12,52 @@ import (
 )
 
 func main() {
-	filepath := "./default/config.json"
-	machinesConfig, templates, err := parser.ParseFactoryConfig(filepath)
-	if err != nil {
-		panic(err)
+	if len(os.Args) < 3 {
+		fmt.Println("Usage: go run main.go <factory_config_path> <orders_path>")
+		os.Exit(1)
 	}
-	factory := &factory.Factory{}
-	factory.Configure(machinesConfig, templates)
-	factory.SetPlanner(&naive.Strategy{})
+
+	factoryConfigPath := os.Args[1]
+	ordersPath := os.Args[2]
+
+	machinesConfig, templates, err := parser.ParseFactoryConfig(factoryConfigPath)
+	if err != nil {
+		fmt.Printf("Error parsing factory config: %v\n", err)
+		os.Exit(1)
+	}
+
+	f := &factory.Factory{}
+	f.Configure(machinesConfig, templates)
+	f.SetPlanner(&naive.Strategy{})
+
 	startTime := time.Date(2022, 1, 1, 0, 0, 0, 0, time.Local)
 
-	filepath = "./default/order.json"
-	orders, err := parser.ParseOrders(filepath)
+	orders, err := parser.ParseOrders(ordersPath)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error parsing orders: %v\n", err)
+		os.Exit(1)
 	}
-	solution, metaInfo, err := factory.Plan(orders, startTime)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(solution)
 
-	solutionChart := chart.GenerateFromSolution(solution, factory.Machines, metaInfo)
-	f, err := os.Create("bar.html")
+	solution, metaInfo, err := f.Plan(orders, startTime)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error during planning: %v\n", err)
+		os.Exit(1)
 	}
-	err = solutionChart.Render(f)
+
+	solutionChart := chart.GenerateFromSolution(solution, f.Machines, metaInfo)
+
+	outputFile, err := os.Create("bar.html")
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error creating output file: %v\n", err)
+		os.Exit(1)
 	}
+	defer outputFile.Close()
+
+	err = solutionChart.Render(outputFile)
+	if err != nil {
+		fmt.Printf("Error rendering chart: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Successfully generated bar.html")
 }

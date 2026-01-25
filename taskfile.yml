@@ -1,10 +1,35 @@
 version: '3'
 
+vars:
+  DEFAULT_DIR: default
+  DEFAULT_CONFIG: "{{.DEFAULT_DIR}}/config.json"
+  DEFAULT_ORDER: "{{.DEFAULT_DIR}}/order.json"
+
 tasks:
   default:
     desc: List available tasks
     cmds:
       - task --list-all
+
+  setup:
+    desc: Copy example configurations and orders to the default directory
+    cmds:
+      - mkdir -p {{.DEFAULT_DIR}}
+      - cp example/config.json {{.DEFAULT_CONFIG}}
+      - cp example/order.json {{.DEFAULT_ORDER}}
+    status:
+      - test -f {{.DEFAULT_CONFIG}}
+      - test -f {{.DEFAULT_ORDER}}
+
+  run:
+    desc: Run the application with config and order paths
+    summary: |
+      Runs the program. 
+      Usage: task run -- [config_path] [order_path]
+      Default: task run -- {{.DEFAULT_CONFIG}} {{.DEFAULT_ORDER}}
+    cmds:
+      - go run main.go {{.CONFIG | default .DEFAULT_CONFIG}} {{.ORDER | default .DEFAULT_ORDER}}
+
   tidy:
     desc: Tidy go modules
     cmds:
@@ -28,4 +53,4 @@ tasks:
   install:linter:
     desc: Install linter
     cmds:
-      - go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.4.0
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
