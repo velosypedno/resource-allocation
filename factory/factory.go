@@ -47,31 +47,22 @@ func (f *Factory) Configure(machineConfigs []parser.MachineConfig, templates []b
 	}
 }
 
-func (f *Factory) AddJobByName(templateName string) error {
-	template, ok := f.Templates[templateName]
-	if !ok {
-		return fmt.Errorf("template '%s' not found", templateName)
-	}
-
-	f.jobCounter++
-	newJob := base.CreateJob(base.JobID(f.jobCounter), template)
-	f.Jobs = append(f.Jobs, &newJob)
-	fmt.Println(f.Jobs)
-	return nil
-}
-
 func (f *Factory) SetPlanner(planner PlannerStrategy) {
 	f.Planner = planner
 }
 
-func (f *Factory) Plan(startTime time.Time) (base.Solution, SchedulingInfo, error) {
+func (f *Factory) Plan(orders []parser.OrderDTO, startTime time.Time) (base.Solution, SchedulingInfo, error) {
 	if f.Planner == nil {
 		return base.Solution{}, SchedulingInfo{}, fmt.Errorf("planner strategy is not set")
 	}
 
 	startPlanning := time.Now()
-	fmt.Println(f.Jobs)
-	solution, machineSlotsMap := f.Planner.Plan(f.Jobs, f.Machines, startTime)
+
+	jobs, err := f.createJobsFromOrders(orders)
+	if err != nil {
+		return base.Solution{}, SchedulingInfo{}, err
+	}
+	solution, machineSlotsMap := f.Planner.Plan(jobs, f.Machines, startTime)
 
 	metaInfo := SchedulingMetaInfo{
 		StrategyName:        f.Planner.Name(),
@@ -80,8 +71,8 @@ func (f *Factory) Plan(startTime time.Time) (base.Solution, SchedulingInfo, erro
 	}
 
 	workflowPeriod := solution.GetWorkFlowPeriod()
-
 	makeSpan := workflowPeriod.Duration()
+
 	utilization := 0.0
 	if makeSpan > 0 {
 		utilization = machineSlotsMap.GetUtilizationLevel(makeSpan)
@@ -92,6 +83,25 @@ func (f *Factory) Plan(startTime time.Time) (base.Solution, SchedulingInfo, erro
 		MakeSpan:           makeSpan,
 		UtilizationLevel:   utilization,
 	}, nil
+}
+
+func (f *Factory) createJobsFromOrders(orders []parser.OrderDTO) ([]*base.Job, error) {
+	var jobs []*base.Job
+	jobIDCounter := 0
+
+	for _, order := range orders {
+		template, ok := f.Templates[order.Name]
+		if !ok {
+			return nil, fmt.Errorf("template '%s' not found for order", order.Name)
+		}
+
+		for i := 0; i < order.Amount; i++ {
+			jobIDCounter++
+			newJob := base.CreateJob(base.JobID(jobIDCounter), template)
+			jobs = append(jobs, &newJob)
+		}
+	}
+	return jobs, nil
 }
 
 type SchedulingMetaInfo struct {

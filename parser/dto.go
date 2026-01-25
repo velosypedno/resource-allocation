@@ -22,3 +22,12 @@ type OperationTemplateDTO struct {
 	ProcessingTime string                 `json:"processing_time"`
 	Children       []OperationTemplateDTO `json:"children,omitempty"`
 }
+
+type OrderConfig struct {
+	Orders []OrderDTO `json:"orders"`
+}
+
+type OrderDTO struct {
+	Name   string `json:"name"`
+	Amount int    `json:"amount"`
+}

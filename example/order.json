@@ -1,0 +1,16 @@
+{
+    "orders": [
+        {
+            "name": "Bicycle",
+            "amount": 4
+        },
+        {
+            "name": "Scooter",
+            "amount": 1
+        },
+        {
+            "name": "Skateboard",
+            "amount": 4
+        }
+    ]
+}

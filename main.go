@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	filepath := "./default_factory_config.json"
+	filepath := "./default/config.json"
 	machinesConfig, templates, err := parser.ParseFactoryConfig(filepath)
 	if err != nil {
 		panic(err)
@@ -20,17 +20,14 @@ func main() {
 	factory := &factory.Factory{}
 	factory.Configure(machinesConfig, templates)
 	factory.SetPlanner(&naive.Strategy{})
-	factory.AddJobByName("Bicycle")
-	factory.AddJobByName("Bicycle")
-	factory.AddJobByName("Scooter")
-	factory.AddJobByName("Skateboard")
-	factory.AddJobByName("Skateboard")
-	factory.AddJobByName("Bicycle")
-	factory.AddJobByName("Skateboard")
-	factory.AddJobByName("Skateboard")
-	factory.AddJobByName("Bicycle")
 	startTime := time.Date(2022, 1, 1, 0, 0, 0, 0, time.Local)
-	solution, metaInfo, err := factory.Plan(startTime)
+
+	filepath = "./default/order.json"
+	orders, err := parser.ParseOrders(filepath)
+	if err != nil {
+		panic(err)
+	}
+	solution, metaInfo, err := factory.Plan(orders, startTime)
 	if err != nil {
 		panic(err)
 	}
