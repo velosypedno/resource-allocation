@@ -10,6 +10,7 @@ import (
 	"github.com/velosypedno/resource-allocation/factory"
 	"github.com/velosypedno/resource-allocation/parser"
 	"github.com/velosypedno/resource-allocation/strategy/annealing"
+	"github.com/velosypedno/resource-allocation/strategy/clean"
 	"github.com/velosypedno/resource-allocation/strategy/naive"
 	"github.com/velosypedno/resource-allocation/strategy/rnd"
 )
@@ -36,7 +37,8 @@ func main() {
 	f := &factory.Factory{}
 	f.Configure(machinesConfig, templates)
 	annealingStrategy := annealing.New(100, 0.1, 0.99, 100, 15)
-	f.SetPlanners(&rnd.Strategy{}, &naive.Strategy{}, annealingStrategy)
+	cleanAnnealing := clean.NewAnnealingStrategy(100, 0.1, 0.99, 100, 15)
+	f.SetPlanners(&rnd.Strategy{}, &naive.Strategy{}, annealingStrategy, cleanAnnealing)
 
 	startTime := time.Date(2022, 1, 1, 0, 0, 0, 0, time.Local)
 
