@@ -1,4 +1,4 @@
-package annealing
+package sequence
 
 import (
 	"sort"

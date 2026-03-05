@@ -14,6 +14,10 @@ provides the earliest completion time, taking into account the technological seq
 
 type Strategy struct{}
 
+func New() *Strategy {
+	return &Strategy{}
+}
+
 func (Strategy) Name() string {
 	return name
 }

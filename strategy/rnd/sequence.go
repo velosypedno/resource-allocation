@@ -1,4 +1,4 @@
-package encoding
+package rnd
 
 import (
 	"math/rand"
@@ -35,22 +35,10 @@ func (s *Sequence) Shuffle() {
 	})
 }
 
-func (s *Sequence) Swap(i, j int) {
-	if i >= 0 && i < len(s.Data) && j >= 0 && j < len(s.Data) {
-		s.Data[i], s.Data[j] = s.Data[j], s.Data[i]
-	}
-}
-
 func (s *Sequence) Get(index int) int {
 	return s.Data[index]
 }
 
 func (s *Sequence) Len() int {
 	return len(s.Data)
-}
-
-func (s *Sequence) Clone() *Sequence {
-	newData := make([]int, len(s.Data))
-	copy(newData, s.Data)
-	return &Sequence{Data: newData}
 }

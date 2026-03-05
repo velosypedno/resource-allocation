@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/velosypedno/resource-allocation/base"
-	"github.com/velosypedno/resource-allocation/encoding"
 )
 
 const name = "Random Search"
@@ -13,6 +12,10 @@ and schedules them based on the Earliest Slot principle, strictly adhering
 to technological dependencies (post-order traversal).`
 
 type Strategy struct{}
+
+func New() *Strategy {
+	return &Strategy{}
+}
 
 func (Strategy) Name() string        { return name }
 func (Strategy) Description() string { return description }
@@ -28,7 +31,7 @@ func (s *Strategy) Plan(
 	for i, job := range jobs {
 		counts[i] = job.OperationsCount()
 	}
-	seq := encoding.NewSequence(counts)
+	seq := NewSequence(counts)
 	seq.Shuffle()
 
 	jobCounters := make([]int, len(jobs))

@@ -1,4 +1,4 @@
-package annealing
+package sequence
 
 import "github.com/velosypedno/resource-allocation/base"
 

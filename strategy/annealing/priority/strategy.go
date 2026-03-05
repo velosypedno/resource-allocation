@@ -1,4 +1,4 @@
-package clean
+package priority
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ type Simulator interface {
 	TotalOperations() int
 }
 
-type AnnealingStrategy struct {
+type Strategy struct {
 	InitialTemp      float64
 	MinTemp          float64
 	Alpha            float64
@@ -23,8 +23,8 @@ type AnnealingStrategy struct {
 	SwapsPerMutation int
 }
 
-func NewAnnealingStrategy(initialTemp, minTemp, alpha float64, iterations int, swaps int) *AnnealingStrategy {
-	return &AnnealingStrategy{
+func New(initialTemp, minTemp, alpha float64, iterations int, swaps int) *Strategy {
+	return &Strategy{
 		InitialTemp:      initialTemp,
 		MinTemp:          minTemp,
 		Alpha:            alpha,
@@ -33,25 +33,32 @@ func NewAnnealingStrategy(initialTemp, minTemp, alpha float64, iterations int, s
 	}
 }
 
-func (s *AnnealingStrategy) Name() string {
-	return "Simulated Annealing"
+func (s *Strategy) Name() string {
+	return "Simulated Annealing (Priority-Based)"
 }
 
-func (s *AnnealingStrategy) Description() string {
+func (s *Strategy) Description() string {
 	return fmt.Sprintf(
-		"Optimization using thermodynamic annealing. It explores the solution space by occasionally accepting worse moves.\n\n"+
-			"| Parameter         | Value      |\n"+
-			"|-------------------|------------|\n"+
-			"| Initial Temp      | %.2f       |\n"+
-			"| Min Temp          | %.4f       |\n"+
-			"| Alpha (Cooling)   | %.4f       |\n"+
-			"| Iterations/T      | %d         |\n"+
-			"| Swaps Per Mutate  | %d         |",
-		s.InitialTemp, s.MinTemp, s.Alpha, s.Iterations, s.SwapsPerMutation,
+		"Optimization using thermodynamic annealing with Priority Weighting.\n"+
+			"It evolves a vector of weights for each operation. The simulator picks the\n"+
+			"best candidate from the ReadyList based on these priorities.\n\n"+
+			"| %-18s | %-10s |\n"+
+			"|:-------------------|-----------:|\n"+
+			"| %-18s | %10.2f |\n"+
+			"| %-18s | %10.4f |\n"+
+			"| %-18s | %10.4f |\n"+
+			"| %-18s | %10d |\n"+
+			"| %-18s | %10d |",
+		"Parameter", "Value",
+		"Initial Temp", s.InitialTemp,
+		"Min Temp", s.MinTemp,
+		"Alpha (Cooling)", s.Alpha,
+		"Iterations / T", s.Iterations,
+		"Swaps Per Mutate", s.SwapsPerMutation,
 	)
 }
 
-func (s *AnnealingStrategy) Plan(
+func (s *Strategy) Plan(
 	jobs []*base.Job,
 	machines []*base.Machine,
 	startTime time.Time,
@@ -80,7 +87,6 @@ func (s *AnnealingStrategy) Plan(
 
 				if currentRes.Cost < bestRes.Cost {
 					bestRes = currentRes
-					fmt.Printf("[SA] New Best: %.2fs at Temp: %.2f\n", bestRes.Cost, temp)
 				}
 			}
 		}
@@ -90,7 +96,7 @@ func (s *AnnealingStrategy) Plan(
 	return bestRes.Solution, bestRes.MachineSlots
 }
 
-func (s *AnnealingStrategy) mutate(weights []float64) []float64 {
+func (s *Strategy) mutate(weights []float64) []float64 {
 	next := make([]float64, len(weights))
 	copy(next, weights)
 
@@ -103,7 +109,7 @@ func (s *AnnealingStrategy) mutate(weights []float64) []float64 {
 	return next
 }
 
-func (s *AnnealingStrategy) shouldAccept(current, next, temp float64) bool {
+func (s *Strategy) shouldAccept(current, next, temp float64) bool {
 	if next < current {
 		return true
 	}
