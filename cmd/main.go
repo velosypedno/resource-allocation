@@ -20,7 +20,7 @@ func main() {
 		Short: "Resource allocation scheduler for factory production",
 		Long:  `A tool to optimize production plans using various strategies like Simulated Annealing and Genetic Algorithms.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			machinesConfig, templates, err := parser.ParseFactoryConfig(configPath)
+			machinesConfig, templates, strategies, err := parser.ParseFactoryConfig(configPath)
 			if err != nil {
 				fmt.Printf("Error parsing factory config: %v\n", err)
 				os.Exit(1)
@@ -32,7 +32,7 @@ func main() {
 				os.Exit(1)
 			}
 
-			a := app.New(machinesConfig, templates)
+			a := app.New(machinesConfig, templates, strategies)
 			startTime := time.Date(2022, 1, 1, 0, 0, 0, 0, time.Local)
 
 			err = a.Run(startTime, orders, customName)

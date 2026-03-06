@@ -1,86 +1,433 @@
 {
-    "machines": [
-      { "type_id": 0, "type_name": "Assembler", "count": 4 },
-      { "type_id": 1, "type_name": "Smeltery", "count": 2 },
-      { "type_id": 2, "type_name": "Extruder", "count": 1 },
-      { "type_id": 3, "type_name": "Sawmill", "count": 2 }
-    ],
-    "job_templates": [
-      {
-        "name": "Bicycle",
-        "operations": [
-          {
-            "name": "Bicycle Assembly",
-            "machine_type": "Assembler",
-            "processing_time": "60m",
-            "children": [
-              {
-                "name": "Frame Construction",
-                "machine_type": "Assembler",
-                "processing_time": "45m",
-                "children": [
-                  { "name": "Tube Smelting", "machine_type": "Smeltery", "processing_time": "30m" },
-                  { "name": "Fork Extrusion", "machine_type": "Extruder", "processing_time": "20m" }
-                ]
-              },
-              {
-                "name": "Wheel Set",
-                "machine_type": "Extruder",
-                "processing_time": "25m"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "Scooter",
-        "operations": [
-          {
-            "name": "Scooter Assembly",
-            "machine_type": "Assembler",
-            "processing_time": "40m",
-            "children": [
-              {
-                "name": "Handlebar Unit",
-                "machine_type": "Extruder",
-                "processing_time": "20m",
-                "children": [
-                  { "name": "Metal Casting", "machine_type": "Smeltery", "processing_time": "25m" }
-                ]
-              },
-              {
-                "name": "Deck Sawing",
-                "machine_type": "Sawmill",
-                "processing_time": "15m"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "Skateboard",
-        "operations": [
-          {
-            "name": "Skateboard Assembly",
-            "machine_type": "Assembler",
-            "processing_time": "25m",
-            "children": [
-              {
-                "name": "Deck Lamination",
-                "machine_type": "Sawmill",
-                "processing_time": "35m",
-                "children": [
-                  { "name": "Wood Cutting", "machine_type": "Sawmill", "processing_time": "15m" }
-                ]
-              },
-              {
-                "name": "Truck Casting",
-                "machine_type": "Smeltery",
-                "processing_time": "20m"
-              }
-            ]
-          }
-        ]
+  "machines": [
+    { "type_id": 0, "type_name": "Assembler", "count": 2 },
+    { "type_id": 1, "type_name": "Smeltery", "count": 1 },
+    { "type_id": 2, "type_name": "Extruder", "count": 1 },
+    { "type_id": 3, "type_name": "Sawmill", "count": 1 }
+  ],
+  "strategies": [
+    {
+      "type": "greedy",
+      "name": "Greedy (Naive)"
+    },
+    {
+      "type": "random",
+      "name": "Random Search"
+    },
+    {
+      "type": "annealing_sequence_based",
+      "name": "Annealing_Seq",
+      "params": {
+        "initial_temp": 100.0, "min_temp": 0.01, "alpha": 0.95, "iterations": 1000, "swaps": 2
       }
-    ]
-  }
+    },
+    {
+      "type": "annealing_priority_based",
+      "name": "Annealing_Prio",
+      "params": {
+        "initial_temp": 100.0, "min_temp": 0.01, "alpha": 0.95, "iterations": 1000, "swaps": 2
+      }
+    },
+    {
+      "type": "ga",
+      "name": "GA_Small",
+      "params": {
+        "population_size": 16, "generations": 100, "mutation_rate": 0.05, "crossover_rate": 0.7, "elitism_ratio": 0.125
+      }
+    },
+    {
+      "type": "ga",
+      "name": "GA_Standard",
+      "params": {
+        "population_size": 64, "generations": 1000, "mutation_rate": 0.05, "crossover_rate": 0.7, "elitism_ratio": 0.125
+      }
+    },
+    {
+      "type": "ga",
+      "name": "GA_SuperMutable",
+      "params": {
+        "population_size": 512, "generations": 200, "mutation_rate": 0.07, "crossover_rate": 0.7, "elitism_ratio": 0.08
+      }
+    },
+    {
+      "type": "tabu",
+      "name": "Tabu_Search",
+      "params": {
+        "tabu_size": 15, "max_iterations": 500, "neighbors_count": 30
+      }
+    }
+  ],
+  "job_templates": [
+    {
+      "name": "Micro-Satellite",
+      "operations": [
+        {
+          "name": "Final Orbit Test", "machine_type": "Assembler", "processing_time": "180m",
+          "children": [
+            {
+              "name": "Titanium Shield", "machine_type": "Smeltery", "processing_time": "120m",
+              "children": [{ "name": "Rare Ore Refine", "machine_type": "Smeltery", "processing_time": "90m" }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Smart Toaster",
+      "operations": [
+        {
+          "name": "Toaster Assembly", "machine_type": "Assembler", "processing_time": "20m",
+          "children": [
+            { "name": "Heating Element", "machine_type": "Extruder", "processing_time": "15m" },
+            { "name": "Metal Shell", "machine_type": "Smeltery", "processing_time": "15m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Industrial Drill",
+      "operations": [
+        {
+          "name": "Drill Mounting", "machine_type": "Assembler", "processing_time": "60m",
+          "children": [
+            {
+              "name": "Diamond Bit Casting", "machine_type": "Smeltery", "processing_time": "45m",
+              "children": [{ "name": "Carbon Press", "machine_type": "Extruder", "processing_time": "30m" }]
+            },
+            { "name": "Steel Shank", "machine_type": "Sawmill", "processing_time": "40m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Electric Violin",
+      "operations": [
+        {
+          "name": "Sound Tuning", "machine_type": "Assembler", "processing_time": "90m",
+          "children": [
+            { "name": "Body Polishing", "machine_type": "Sawmill", "processing_time": "60m" },
+            { "name": "Bridge Extrusion", "machine_type": "Extruder", "processing_time": "25m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gaming Console",
+      "operations": [
+        {
+          "name": "Mainboard Install", "machine_type": "Assembler", "processing_time": "45m",
+          "children": [
+            { "name": "GPU Heat Sink", "machine_type": "Smeltery", "processing_time": "35m" },
+            { "name": "Plastic Case", "machine_type": "Extruder", "processing_time": "30m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wind Turbine Blade",
+      "operations": [
+        {
+          "name": "Aerodynamic Test", "machine_type": "Assembler", "processing_time": "200m",
+          "children": [
+            {
+              "name": "Core Wood Structure", "machine_type": "Sawmill", "processing_time": "120m",
+              "children": [{ "name": "Lumber Slicing", "machine_type": "Sawmill", "processing_time": "45m" }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Robot Vacuum",
+      "operations": [
+        {
+          "name": "Sensor Sync", "machine_type": "Assembler", "processing_time": "50m",
+          "children": [
+            { "name": "Brush Motor", "machine_type": "Extruder", "processing_time": "40m" },
+            { "name": "Dust Bin", "machine_type": "Sawmill", "processing_time": "20m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Coffee Machine",
+      "operations": [
+        {
+          "name": "Hydraulic Setup", "machine_type": "Assembler", "processing_time": "70m",
+          "children": [
+            { "name": "Water Tank", "machine_type": "Extruder", "processing_time": "35m" },
+            { "name": "Boiler Unit", "machine_type": "Smeltery", "processing_time": "45m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drone Frame",
+      "operations": [
+        {
+          "name": "Frame Rigidity Test", "machine_type": "Assembler", "processing_time": "30m",
+          "children": [
+            { "name": "Arm Carbon Cut", "machine_type": "Sawmill", "processing_time": "25m" },
+            { "name": "Central Hub", "machine_type": "Smeltery", "processing_time": "20m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "High-End Camera",
+      "operations": [
+        {
+          "name": "Lens Calibration", "machine_type": "Assembler", "processing_time": "110m",
+          "children": [
+            { "name": "Optics Housing", "machine_type": "Extruder", "processing_time": "55m" },
+            { "name": "Chassis Cast", "machine_type": "Smeltery", "processing_time": "40m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Supercomputer Module",
+      "operations": [
+        {
+          "name": "Node Stress Test", "machine_type": "Assembler", "processing_time": "240m",
+          "children": [
+            {
+              "name": "Liquid Cooling Loop", "machine_type": "Extruder", "processing_time": "120m",
+              "children": [
+                {
+                  "name": "Thermal Paste Apply", "machine_type": "Assembler", "processing_time": "15m",
+                  "children": [
+                    { "name": "Copper Plate Cast", "machine_type": "Smeltery", "processing_time": "100m" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Eco-Friendly Chair",
+      "operations": [
+        {
+          "name": "Ergonomic Finish", "machine_type": "Sawmill", "processing_time": "45m",
+          "children": [
+            { "name": "Left Leg", "machine_type": "Sawmill", "processing_time": "20m" },
+            { "name": "Right Leg", "machine_type": "Sawmill", "processing_time": "20m" },
+            { "name": "Backrest", "machine_type": "Sawmill", "processing_time": "30m" },
+            { "name": "Seat Base", "machine_type": "Sawmill", "processing_time": "25m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Electric Engine",
+      "operations": [
+        {
+          "name": "Magnetic Field Test", "machine_type": "Assembler", "processing_time": "80m",
+          "children": [
+            {
+              "name": "Rotor Assembly", "machine_type": "Assembler", "processing_time": "40m",
+              "children": [
+                { "name": "Core Lamination", "machine_type": "Extruder", "processing_time": "60m" },
+                { "name": "Coil Winding", "machine_type": "Extruder", "processing_time": "50m" }
+              ]
+            },
+            { "name": "Stator Housing", "machine_type": "Smeltery", "processing_time": "70m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Medical Scanner Part",
+      "operations": [
+        {
+          "name": "Radiation Shielding", "machine_type": "Smeltery", "processing_time": "180m",
+          "children": [
+            { "name": "Lead Infusion", "machine_type": "Smeltery", "processing_time": "60m" },
+            { "name": "Precise Frame", "machine_type": "Sawmill", "processing_time": "90m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Smart Watch",
+      "operations": [
+        {
+          "name": "Micro-Integration", "machine_type": "Assembler", "processing_time": "25m",
+          "children": [
+            { "name": "Glass Polish", "machine_type": "Sawmill", "processing_time": "15m" },
+            { "name": "Wristband Mold", "machine_type": "Extruder", "processing_time": "10m" },
+            { "name": "Tiny Case Cast", "machine_type": "Smeltery", "processing_time": "10m" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Electric Mountain Bike",
+      "operations": [
+        {
+          "name": "Final Quality Control & Packing",
+          "machine_type": "Assembler",
+          "processing_time": "45m",
+          "children": [
+            {
+              "name": "Full Bike Assembly",
+              "machine_type": "Assembler",
+              "processing_time": "90m",
+              "children": [
+                {
+                  "name": "Drivetrain & Motor Integration",
+                  "machine_type": "Assembler",
+                  "processing_time": "60m",
+                  "children": [
+                    {
+                      "name": "Motor Mid-Drive Unit",
+                      "machine_type": "Assembler",
+                      "processing_time": "40m",
+                      "children": [
+                        {
+                          "name": "Casing Assembly",
+                          "machine_type": "Extruder",
+                          "processing_time": "30m",
+                          "children": [
+                            {
+                              "name": "Alloy Smelting",
+                              "machine_type": "Smeltery",
+                              "processing_time": "25m",
+                              "children": [
+                                { "name": "Raw Ore Processing", "machine_type": "Smeltery", "processing_time": "20m" }
+                              ]
+                            }
+                          ]
+                        },
+                        { "name": "Internal Gear Cutting", "machine_type": "Sawmill", "processing_time": "35m" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Advanced Frame Set",
+                  "machine_type": "Assembler",
+                  "processing_time": "75m",
+                  "children": [
+                    {
+                      "name": "Hydraulic Suspension Fork",
+                      "machine_type": "Extruder",
+                      "processing_time": "50m",
+                      "children": [
+                        {
+                          "name": "Piston Polishing",
+                          "machine_type": "Sawmill",
+                          "processing_time": "20m",
+                          "children": [
+                            {
+                              "name": "Steel Casting",
+                              "machine_type": "Smeltery",
+                              "processing_time": "30m",
+                              "children": [
+                                { "name": "Iron Purification", "machine_type": "Smeltery", "processing_time": "15m" }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Carbon-Fiber-Look Reinforcement",
+                      "machine_type": "Sawmill",
+                      "processing_time": "40m"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Autonomous Cargo Drone",
+      "operations": [
+        {
+          "name": "Final Systems Integration",
+          "machine_type": "Assembler",
+          "processing_time": "140m",
+          "children": [
+            {
+              "name": "Avionics & AI Brain",
+              "machine_type": "Assembler",
+              "processing_time": "50m",
+              "children": [
+                { "name": "Sensor Calibration", "machine_type": "Extruder", "processing_time": "20m" },
+                { "name": "CPU Housing Casting", "machine_type": "Smeltery", "processing_time": "80m" }
+              ]
+            },
+            {
+              "name": "Propulsion System (4x Units)",
+              "machine_type": "Assembler",
+              "processing_time": "60m",
+              "children": [
+                {
+                  "name": "Motor Windings",
+                  "machine_type": "Extruder",
+                  "processing_time": "45m",
+                  "children": [
+                    { "name": "Copper Smelting", "machine_type": "Smeltery", "processing_time": "25m" }
+                  ]
+                },
+                {
+                  "name": "Carbon Blade Sets",
+                  "machine_type": "Sawmill",
+                  "processing_time": "35m",
+                  "children": [
+                    { "name": "Composite Cutting", "machine_type": "Sawmill", "processing_time": "15m" }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Energy Core (Battery Pack)",
+              "machine_type": "Assembler",
+              "processing_time": "30m",
+              "children": [
+                {
+                  "name": "Cell Container",
+                  "machine_type": "Extruder",
+                  "processing_time": "25m",
+                  "children": [
+                    { "name": "Lithium Housing Smelt", "machine_type": "Smeltery", "processing_time": "20m" }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Cargo Bay Structure",
+              "machine_type": "Sawmill",
+              "processing_time": "40m",
+              "children": [
+                { "name": "Reinforced Struts", "machine_type": "Sawmill", "processing_time": "20m" },
+                { "name": "Mounting Brackets", "machine_type": "Extruder", "processing_time": "15m" }
+              ]
+            },
+            {
+              "name": "Landing Gear Hydraulics",
+              "machine_type": "Extruder",
+              "processing_time": "35m",
+              "children": [
+                {
+                  "name": "Piston Casting",
+                  "machine_type": "Smeltery",
+                  "processing_time": "25m",
+                  "children": [
+                    { "name": "Titanium Purification", "machine_type": "Smeltery", "processing_time": "40m" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

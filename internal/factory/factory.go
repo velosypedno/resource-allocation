@@ -8,12 +8,6 @@ import (
 	"github.com/velosypedno/resource-allocation/internal/parser"
 )
 
-type PlannerStrategy interface {
-	Plan([]*base.Job, []*base.Machine, time.Time) (*base.Solution, base.MachineTimeSlots)
-	Name() string
-	Description() string
-}
-
 type PlanResult struct {
 	Solution *base.Solution
 	Info     SchedulingInfo
@@ -24,7 +18,7 @@ type Factory struct {
 	Machines  []*base.Machine
 	Templates map[string]base.JobTemplate
 
-	Planners []PlannerStrategy
+	Planners []parser.Strategy
 
 	machineTypeRegistry map[string]base.MachineType
 	jobCounter          int
@@ -52,7 +46,7 @@ func (f *Factory) Configure(machineConfigs []parser.MachineConfig, templates []b
 	}
 }
 
-func (f *Factory) SetPlanners(planners ...PlannerStrategy) {
+func (f *Factory) SetPlanners(planners ...parser.Strategy) {
 	f.Planners = planners
 }
 

@@ -1,16 +1,21 @@
 {
     "orders": [
-        {
-            "name": "Bicycle",
-            "amount": 4
-        },
-        {
-            "name": "Scooter",
-            "amount": 1
-        },
-        {
-            "name": "Skateboard",
-            "amount": 4
-        }
+        { "name": "Micro-Satellite", "amount": 1 },
+        { "name": "Supercomputer Module", "amount": 1 },
+        { "name": "Medical Scanner Part", "amount": 1 },
+        { "name": "Wind Turbine Blade", "amount": 1 },
+        { "name": "Electric Engine", "amount": 1 },
+        { "name": "High-End Camera", "amount": 1 },
+        { "name": "Industrial Drill", "amount": 1 },
+        { "name": "Eco-Friendly Chair", "amount": 1 },
+        { "name": "Robot Vacuum", "amount": 1 },
+        { "name": "Coffee Machine", "amount": 1 },
+        { "name": "Gaming Console", "amount": 1 },
+        { "name": "Drone Frame", "amount": 1 },
+        { "name": "Electric Violin", "amount": 1 },
+        { "name": "Smart Toaster", "amount": 1 },
+        { "name": "Smart Watch", "amount": 1 },
+        { "name":  "Electric Mountain Bike", "amount": 1 },
+        { "name":  "Autonomous Cargo Drone", "amount": 1 }
     ]
 }
