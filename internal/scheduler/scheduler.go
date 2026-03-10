@@ -1,4 +1,4 @@
-package factory
+package scheduler
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ type PlanResult struct {
 	Info     SchedulingInfo
 }
 
-type Factory struct {
+type Scheduler struct {
 	Jobs      []*base.Job
 	Machines  []*base.Machine
 	Templates map[string]base.JobTemplate
@@ -25,7 +25,7 @@ type Factory struct {
 	machineCounter      int
 }
 
-func (f *Factory) Configure(machineConfigs []parser.MachineConfig, templates []base.JobTemplate) {
+func (f *Scheduler) Configure(machineConfigs []parser.MachineConfig, templates []base.JobTemplate) {
 	f.Templates = make(map[string]base.JobTemplate)
 	f.machineTypeRegistry = make(map[string]base.MachineType)
 
@@ -46,11 +46,11 @@ func (f *Factory) Configure(machineConfigs []parser.MachineConfig, templates []b
 	}
 }
 
-func (f *Factory) SetPlanners(planners ...parser.Strategy) {
+func (f *Scheduler) SetPlanners(planners ...parser.Strategy) {
 	f.Planners = planners
 }
 
-func (f *Factory) Plan(orders []parser.OrderDTO, startTime time.Time) ([]PlanResult, error) {
+func (f *Scheduler) Plan(orders []parser.OrderDTO, startTime time.Time) ([]PlanResult, error) {
 	if len(f.Planners) == 0 {
 		return nil, fmt.Errorf("no planner strategies set")
 	}
@@ -94,7 +94,7 @@ func (f *Factory) Plan(orders []parser.OrderDTO, startTime time.Time) ([]PlanRes
 	return results, nil
 }
 
-func (f *Factory) createJobsFromOrders(orders []parser.OrderDTO) ([]*base.Job, error) {
+func (f *Scheduler) createJobsFromOrders(orders []parser.OrderDTO) ([]*base.Job, error) {
 	var jobs []*base.Job
 	jobIDCounter := 0
 

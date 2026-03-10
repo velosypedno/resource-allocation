@@ -1,4 +1,4 @@
 vendor/
 *.html
 default/
-scheduler
+/scheduler

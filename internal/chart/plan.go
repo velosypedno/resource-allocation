@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/velosypedno/resource-allocation/internal/base"
-	"github.com/velosypedno/resource-allocation/internal/factory"
+	"github.com/velosypedno/resource-allocation/internal/scheduler"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/components"
@@ -185,7 +185,7 @@ func createBaseCustomChart(machines []*base.Machine, period base.Period, descrip
 		charts.WithGridOpts(opts.Grid{
 			Top:          fmt.Sprintf("%dpx", topOffset),
 			Left:         "5%",
-			Right:        "10%",
+			Right:        "15%",
 			ContainLabel: opts.Bool(true),
 		}),
 		charts.WithLegendOpts(opts.Legend{
@@ -228,7 +228,7 @@ func addSolutionSeries(chart *charts.Custom, solution *base.Solution, machines [
 	}
 }
 
-func formatStrategyDescription(meta factory.SchedulingInfo) string {
+func formatStrategyDescription(meta scheduler.SchedulingInfo) string {
 	execTime := meta.SchedulingTime.Round(time.Millisecond).String()
 	makespan := meta.MakeSpan.String()
 	utilization := fmt.Sprintf("%.1f%%", meta.UtilizationLevel*100)
@@ -251,7 +251,7 @@ func formatStrategyDescription(meta factory.SchedulingInfo) string {
 func GenerateFromSolution(
 	solution *base.Solution,
 	machines []*base.Machine,
-	schedulingInfo factory.SchedulingInfo,
+	schedulingInfo scheduler.SchedulingInfo,
 ) *charts.Custom {
 	sortMachines(machines)
 	period := solution.GetWorkFlowPeriod()
@@ -263,7 +263,7 @@ func GenerateFromSolution(
 }
 
 func GenerateFromSolutions(
-	results []factory.PlanResult,
+	results []scheduler.PlanResult,
 	machines []*base.Machine,
 ) *components.Page {
 
