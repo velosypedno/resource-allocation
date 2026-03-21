@@ -20,9 +20,10 @@ type Strategy struct {
 	ElitismRatio   float64
 
 	logger *zap.Logger
+	name   string
 }
 
-func New(popSize, generations int, mutationRate, crossoverRate, elitism float64) *Strategy {
+func New(popSize, generations int, mutationRate, crossoverRate, elitism float64, name string) *Strategy {
 	l, _ := zap.NewProduction()
 	return &Strategy{
 		PopulationSize: popSize,
@@ -32,6 +33,7 @@ func New(popSize, generations int, mutationRate, crossoverRate, elitism float64)
 		ElitismRatio:   elitism,
 
 		logger: l,
+		name:   name,
 	}
 }
 
@@ -39,8 +41,12 @@ func (s *Strategy) SetLogger(l *zap.Logger) {
 	s.logger = l
 }
 
-func (s *Strategy) Name() string {
+func (s *Strategy) Type() string {
 	return "Genetic Algorithm (Priority-Based)"
+}
+
+func (s *Strategy) Name() string {
+	return s.name
 }
 
 func (s *Strategy) Description() string {
@@ -79,7 +85,7 @@ func (s *Strategy) Plan(
 	n := sim.TotalOperations()
 
 	s.logger.Info("Starting resource allocation planning",
-		zap.String("strategy_type", s.Name()),
+		zap.String("strategy_type", s.Type()),
 		zap.Int("jobs_count", len(jobs)),
 		zap.Int("machines_count", len(machines)),
 		zap.Int("total_operations", n),
@@ -145,7 +151,7 @@ func (s *Strategy) Plan(
 	best := population[0]
 
 	s.logger.Info("Optimization completed",
-		zap.String("strategy_type", s.Name()),
+		zap.String("strategy_type", s.Type()),
 		zap.Any("final_makespan", best.result.Cost),
 		zap.Duration("duration_since_start", time.Since(startTime)),
 	)

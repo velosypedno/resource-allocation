@@ -7,20 +7,24 @@ import (
 	"go.uber.org/zap"
 )
 
-const name = "Random Search"
+const strategyType = "Random Search"
 const description = `Generates a random sequence of operations (Sequence) 
 and schedules them based on the Earliest Slot principle, strictly adhering 
 to technological dependencies (post-order traversal).`
 
-type Strategy struct{}
+type Strategy struct {
+	name string
+}
 
 func (_ Strategy) SetLogger(_ *zap.Logger) {}
 
-func New() *Strategy {
-	return &Strategy{}
+func New(name string) *Strategy {
+	return &Strategy{
+		name: name,
+	}
 }
-
-func (Strategy) Name() string        { return name }
+func (s *Strategy) Name() string     { return s.name }
+func (Strategy) Type() string        { return strategyType }
 func (Strategy) Description() string { return description }
 
 func (s *Strategy) Plan(

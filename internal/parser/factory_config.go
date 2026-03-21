@@ -17,6 +17,7 @@ import (
 
 type Strategy interface {
 	Plan([]*base.Job, []*base.Machine, time.Time) (*base.Solution, base.MachineTimeSlots)
+	Type() string
 	Name() string
 	Description() string
 	SetLogger(l *zap.Logger)
@@ -101,14 +102,14 @@ func createStrategy(dto StrategyDTO) (Strategy, error) {
 		if err := json.Unmarshal(dto.Params, &p); err != nil {
 			return nil, err
 		}
-		return ga.New(p.PopulationSize, p.Generations, p.MutationRate, p.CrossoverRate, p.ElitismRatio), nil
+		return ga.New(p.PopulationSize, p.Generations, p.MutationRate, p.CrossoverRate, p.ElitismRatio, dto.Name), nil
 
 	case "tabu":
 		var p TabuConfigDTO
 		if err := json.Unmarshal(dto.Params, &p); err != nil {
 			return nil, err
 		}
-		return tabu.New(p.TabuSize, p.MaxIterations, p.NeighborsCount), nil
+		return tabu.New(p.TabuSize, p.MaxIterations, p.NeighborsCount, dto.Name), nil
 
 	case "annealing_priority_based":
 		var p AnnealingConfigDTO
@@ -122,7 +123,7 @@ func createStrategy(dto StrategyDTO) (Strategy, error) {
 			Iterations:       p.Iterations,
 			SwapsPerMutation: p.Swaps,
 		}
-		return annealing.NewPriorityBased(annealingConfig), nil
+		return annealing.NewPriorityBased(annealingConfig, dto.Name), nil
 
 	case "annealing_sequence_based":
 		var p AnnealingConfigDTO
@@ -136,13 +137,13 @@ func createStrategy(dto StrategyDTO) (Strategy, error) {
 			Iterations:       p.Iterations,
 			SwapsPerMutation: p.Swaps,
 		}
-		return annealing.NewSequenceBased(annealingConfig), nil
+		return annealing.NewSequenceBased(annealingConfig, dto.Name), nil
 
 	case "greedy", "naive":
-		return naive.New(), nil
+		return naive.New(dto.Name), nil
 
 	case "random":
-		return rnd.New(), nil
+		return rnd.New(dto.Name), nil
 
 	default:
 		return nil, fmt.Errorf("unknown strategy type: %s", dto.Type)

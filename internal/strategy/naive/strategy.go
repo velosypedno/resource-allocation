@@ -8,27 +8,33 @@ import (
 	"go.uber.org/zap"
 )
 
-const name = "Greedy"
+const strategyType = "Greedy"
 const description = `Greedy Earliest Completion Time scheduling. Each operation is assigned to the machine that 
 provides the earliest completion time, taking into account the technological sequence 
 (dependence on child operations) and already occupied time slots.`
 
 type Strategy struct {
 	logger *zap.Logger
+	name   string
 }
 
-func New() *Strategy {
+func New(name string) *Strategy {
 	l, _ := zap.NewProduction()
 	return &Strategy{
 		logger: l,
+		name:   name,
 	}
 }
 
 func (s *Strategy) SetLogger(l *zap.Logger) {
 	s.logger = l
 }
-func (Strategy) Name() string {
-	return name
+func (Strategy) Type() string {
+	return strategyType
+}
+
+func (s *Strategy) Name() string {
+	return s.name
 }
 
 func (Strategy) Description() string {
@@ -41,7 +47,7 @@ func (s *Strategy) Plan(
 	startTime time.Time,
 ) (*base.Solution, base.MachineTimeSlots) {
 	s.logger.Info("Starting Greedy planning",
-		zap.String("strategy_type", s.Name()),
+		zap.String("strategy_type", s.Type()),
 		zap.Int("jobs_count", len(jobs)),
 		zap.Int("machines_count", len(machines)),
 	)

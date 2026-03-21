@@ -16,22 +16,30 @@ type Strategy struct {
 	Alpha            float64
 	Iterations       int
 	SwapsPerMutation int
+
+	name string
 }
 
 func (_ Strategy) SetLogger(_ *zap.Logger) {}
 
-func New(initialTemp, minTemp, alpha float64, iterations int, swaps int) *Strategy {
+func New(initialTemp, minTemp, alpha float64, iterations int, swaps int, name string) *Strategy {
 	return &Strategy{
 		InitialTemp:      initialTemp,
 		MinTemp:          minTemp,
 		Alpha:            alpha,
 		Iterations:       iterations,
 		SwapsPerMutation: swaps,
+
+		name: name,
 	}
 }
 
-func (s *Strategy) Name() string {
+func (s *Strategy) Type() string {
 	return "Simulated Annealing (Sequence-Based)"
+}
+
+func (s *Strategy) Name() string {
+	return s.name
 }
 
 func (s *Strategy) Description() string {

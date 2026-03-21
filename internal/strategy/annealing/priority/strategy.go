@@ -23,9 +23,10 @@ type Strategy struct {
 	Iterations       int
 	SwapsPerMutation int
 	logger           *zap.Logger
+	name             string
 }
 
-func New(initialTemp, minTemp, alpha float64, iterations int, swaps int) *Strategy {
+func New(initialTemp, minTemp, alpha float64, iterations int, swaps int, name string) *Strategy {
 	l, _ := zap.NewProduction()
 	return &Strategy{
 		InitialTemp:      initialTemp,
@@ -34,6 +35,7 @@ func New(initialTemp, minTemp, alpha float64, iterations int, swaps int) *Strate
 		Iterations:       iterations,
 		SwapsPerMutation: swaps,
 		logger:           l,
+		name:             name,
 	}
 }
 
@@ -41,8 +43,12 @@ func (s *Strategy) SetLogger(l *zap.Logger) {
 	s.logger = l
 }
 
-func (s *Strategy) Name() string {
+func (s *Strategy) Type() string {
 	return "Simulated Annealing (Priority-Based)"
+}
+
+func (s *Strategy) Name() string {
+	return s.name
 }
 
 func (s *Strategy) Description() string {
@@ -75,7 +81,7 @@ func (s *Strategy) Plan(
 	n := sim.TotalOperations()
 
 	s.logger.Info("Starting Simulated Annealing",
-		zap.String("strategy_type", s.Name()),
+		zap.String("strategy_type", s.Type()),
 		zap.Float64("initial_temp", s.InitialTemp),
 		zap.Float64("alpha", s.Alpha),
 		zap.Int("ops_count", n),

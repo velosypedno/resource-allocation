@@ -15,15 +15,17 @@ type Strategy struct {
 	MaxIterations  int
 	NeighborsCount int
 	logger         *zap.Logger
+	name           string
 }
 
-func New(tabuSize, maxIter, neighbors int) *Strategy {
+func New(tabuSize, maxIter, neighbors int, name string) *Strategy {
 	l, _ := zap.NewProduction()
 	return &Strategy{
 		TabuSize:       tabuSize,
 		MaxIterations:  maxIter,
 		NeighborsCount: neighbors,
 		logger:         l,
+		name:           name,
 	}
 }
 
@@ -31,8 +33,12 @@ func (s *Strategy) SetLogger(l *zap.Logger) {
 	s.logger = l
 }
 
-func (s *Strategy) Name() string {
+func (s *Strategy) Type() string {
 	return "Tabu Search (Priority-Based)"
+}
+
+func (s *Strategy) Name() string {
+	return s.name
 }
 
 func (s *Strategy) Description() string {
@@ -64,7 +70,7 @@ func (s *Strategy) Plan(
 	n := sim.TotalOperations()
 
 	s.logger.Info("Starting Tabu Search optimization",
-		zap.String("strategy_type", s.Name()),
+		zap.String("strategy_type", s.Type()),
 		zap.Int("max_iterations", s.MaxIterations),
 		zap.Int("neighbors_count", s.NeighborsCount),
 		zap.Int("tabu_size", s.TabuSize),

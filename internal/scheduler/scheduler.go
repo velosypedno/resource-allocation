@@ -77,7 +77,8 @@ func (f *Scheduler) Plan(orders []parser.OrderDTO, startTime time.Time) ([]PlanR
 		solution, machineSlotsMap := planner.Plan(jobs, f.Machines, startTime)
 
 		metaInfo := SchedulingMetaInfo{
-			StrategyType:        planner.Name(),
+			StrategyName:        planner.Name(),
+			StrategyType:        planner.Type(),
 			StrategyDescription: planner.Description(),
 			SchedulingTime:      time.Since(startPlanning),
 		}
@@ -124,6 +125,7 @@ func (f *Scheduler) createJobsFromOrders(orders []parser.OrderDTO) ([]*base.Job,
 
 type SchedulingMetaInfo struct {
 	StrategyType        string
+	StrategyName        string
 	StrategyDescription string
 	SchedulingTime      time.Duration
 }

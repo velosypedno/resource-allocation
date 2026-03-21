@@ -13,22 +13,24 @@ type Config struct {
 	SwapsPerMutation int
 }
 
-func NewSequenceBased(cfg Config) *sequence.Strategy {
+func NewSequenceBased(cfg Config, name string) *sequence.Strategy {
 	return sequence.New(
 		cfg.InitialTemp,
 		cfg.MinTemp,
 		cfg.Alpha,
 		cfg.Iterations,
 		cfg.SwapsPerMutation,
+		name,
 	)
 }
 
-func NewPriorityBased(cfg Config) *priority.Strategy {
+func NewPriorityBased(cfg Config, name string) *priority.Strategy {
 	return priority.New(
 		cfg.InitialTemp,
 		cfg.MinTemp,
 		cfg.Alpha,
 		cfg.Iterations,
 		cfg.SwapsPerMutation,
+		name,
 	)
 }
